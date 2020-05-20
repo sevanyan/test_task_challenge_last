@@ -1,25 +1,36 @@
 const tape = require('tape')
 const jsonist = require('jsonist')
 
-const PORT = process.env.PORT = process.env.PORT || require('get-PORT-sync')()
-const server = require('./server')
-
+const PORT = process.env.PORT || require('get-port-sync')()
+const server = require('./server')(PORT)
 const urlBase = `http://localhost:${PORT}`
 
 tape('should respond hello', (t) => {
   jsonist.get(urlBase, (err, body) => {
-    if (err) t.error(err)
+    try {
+      if (err) throw err.message
 
-    t.equal(body.msg, 'hello')
+      if(!body.msg) throw 'empty body'
+
+      t.equal(body.msg, 'hello')
+    } catch (e) {
+      console.log('error from should respond hello ', e)
+    }
     t.end()
   })
 })
 
 tape('should respond b64', (t) => {
   jsonist.get(`${urlBase}/b64/hello`, (err, body) => {
-    if (err) t.error(err)
+    try {
+      if (err) throw err.message
 
-    t.equal(body.b64, 'aGVsbG8=')
+      if(!body.b64) throw 'empty body'
+
+      t.equal(body.b64, 'aGVsbG8=')
+    } catch (e) {
+      console.log('error from should respond b64 ', e)
+    }
     t.end()
   })
 })
@@ -27,9 +38,15 @@ tape('should respond b64', (t) => {
 tape('should respond user-agent', (t) => {
   const opts = { headers: { 'User-Agent': 'tape' } }
   jsonist.get(`${urlBase}/user-agent`, opts, (err, body) => {
-    if (err) t.error(err)
+    try {
+      if (err) throw err.message
 
-    t.equal(body.ua, 'tape')
+      if(!body.ua) throw 'empty body'
+
+      t.equal(body.ua, 'tape')
+    } catch (e) {
+      console.log('error from should respond user-agent ', e)
+    }
     t.end()
   })
 })
